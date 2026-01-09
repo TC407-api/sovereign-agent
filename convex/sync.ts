@@ -10,7 +10,7 @@ export const syncEmails = action({
     maxEmails: v.optional(v.number()),
   },
   handler: async (ctx, args): Promise<{ synced: number; errors: number }> => {
-    const maxEmails = args.maxEmails ?? 50;
+    const maxEmails = args.maxEmails ?? 500;
 
     // Dynamically import GmailService to avoid bundling issues
     const { GmailService } = await import("../lib/gmail");

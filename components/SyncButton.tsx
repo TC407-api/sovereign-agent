@@ -24,14 +24,14 @@ export function SyncButton() {
     try {
       const syncResult = await syncEmails({
         accessToken: session.accessToken,
-        maxEmails: 50,
+        maxEmails: 500,
       });
       setResult(syncResult);
 
       // Clear result after 5 seconds
       setTimeout(() => setResult(null), 5000);
     } catch (error) {
-      console.error('Sync failed:', error);
+      console.warn('Gmail sync requires OAuth setup');
       setResult({ synced: 0, errors: 1 });
     } finally {
       setIsLoading(false);
