@@ -1,6 +1,15 @@
 # Sovereign Agent
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Tests](https://img.shields.io/badge/tests-556%20passing-brightgreen)](https://github.com/TC407-api/sovereign-agent)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-15-black?logo=next.js&logoColor=white)](https://nextjs.org/)
+[![Convex](https://img.shields.io/badge/Convex-Real--time-orange?logo=convex&logoColor=white)](https://convex.dev/)
+[![Gemini](https://img.shields.io/badge/Google%20Gemini-AI-4285F4?logo=google&logoColor=white)](https://ai.google.dev/)
+
 A world-class AI-powered personal assistant for email and calendar management, built with Next.js 15, Convex, and Google Gemini.
+
+> **Built with TDD** - Every feature was developed test-first with 556 tests ensuring reliability.
 
 ## Features
 
@@ -56,7 +65,7 @@ A world-class AI-powered personal assistant for email and calendar management, b
 
 ```bash
 # Clone the repository
-git clone <repo-url>
+git clone https://github.com/TC407-api/sovereign-agent.git
 cd sovereign-agent
 
 # Install dependencies
