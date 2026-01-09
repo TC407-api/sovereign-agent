@@ -128,17 +128,43 @@ export default defineSchema({
     emailId: v.id("emails"),
     subject: v.string(),
     body: v.string(),
+    originalContent: v.string(),
     generatedAt: v.number(),
     status: v.union(
       v.literal("draft"),
+      v.literal("approved"),
+      v.literal("rejected"),
       v.literal("sent"),
       v.literal("discarded")
     ),
+    editCount: v.number(),
+    approvedAt: v.optional(v.number()),
+    rejectedAt: v.optional(v.number()),
+    rejectionReason: v.optional(v.string()),
     metadata: v.optional(v.object({
       model: v.string(),
       temperature: v.optional(v.number()),
+      version: v.optional(v.number()),
+      userFeedback: v.optional(v.string()),
+      scheduledSendTime: v.optional(v.number()),
     })),
   })
     .index("by_email_id", ["emailId"])
     .index("by_status", ["status"]),
+
+  // Phase 4: Contact management
+  contacts: defineTable({
+    email: v.string(),
+    name: v.optional(v.string()),
+    company: v.optional(v.string()),
+    role: v.optional(v.string()),
+    avatarUrl: v.optional(v.string()),
+    lastInteraction: v.number(),
+    interactionCount: v.number(),
+    commonTopics: v.array(v.string()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_email", ["email"])
+    .index("by_interaction_count", ["interactionCount"]),
 });

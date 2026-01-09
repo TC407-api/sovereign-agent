@@ -1,11 +1,10 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { useAction } from "convex/react";
-import { useSession } from "next-auth/react";
-import { api } from "@/convex/_generated/api";
-import { Button } from "@/components/ui/button";
-import { RefreshCw, Check, AlertCircle } from "lucide-react";
+import { useState } from 'react';
+import { useAction } from 'convex/react';
+import { useSession } from 'next-auth/react';
+import { api } from '@/convex/_generated/api';
+import { RefreshCw, Check, AlertCircle, Mail } from 'lucide-react';
 
 export function SyncButton() {
   const { data: session } = useSession();
@@ -28,8 +27,11 @@ export function SyncButton() {
         maxEmails: 50,
       });
       setResult(syncResult);
+
+      // Clear result after 5 seconds
+      setTimeout(() => setResult(null), 5000);
     } catch (error) {
-      console.error("Sync failed:", error);
+      console.error('Sync failed:', error);
       setResult({ synced: 0, errors: 1 });
     } finally {
       setIsLoading(false);
@@ -37,30 +39,47 @@ export function SyncButton() {
   };
 
   return (
-    <div className="flex items-center gap-2">
-      <Button
+    <div className="flex items-center gap-3">
+      <button
         onClick={handleSync}
         disabled={isLoading || !session?.accessToken}
-        variant="outline"
+        className={`
+          flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all
+          ${isLoading
+            ? 'bg-blue-500/20 text-blue-400 cursor-wait'
+            : 'bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-400 hover:to-indigo-400 text-white hover:scale-105'
+          }
+          disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100
+        `}
       >
-        <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? "animate-spin" : ""}`} />
-        {isLoading ? "Syncing..." : "Sync Gmail"}
-      </Button>
+        {isLoading ? (
+          <RefreshCw className="w-4 h-4 animate-spin" />
+        ) : (
+          <Mail className="w-4 h-4" />
+        )}
+        {isLoading ? 'Syncing...' : 'Sync Gmail'}
+      </button>
 
       {result && (
-        <span className="text-sm flex items-center gap-1">
+        <div className={`
+          flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm
+          ${result.errors === 0
+            ? 'bg-green-500/20 text-green-400'
+            : 'bg-red-500/20 text-red-400'
+          }
+        `}>
           {result.errors === 0 ? (
             <>
-              <Check className="h-4 w-4 text-green-500" />
-              <span className="text-green-600">Synced {result.synced} emails</span>
+              <Check className="w-4 h-4" />
+              <span>{result.synced} emails synced</span>
             </>
           ) : (
             <>
-              <AlertCircle className="h-4 w-4 text-red-500" />
-              <span className="text-red-600">Sync had errors</span>
+              <AlertCircle className="w-4 h-4" />
+              <span>Sync failed</span>
             </>
           )}
-        </span>
+        </div>
       )}
     </div>
   );

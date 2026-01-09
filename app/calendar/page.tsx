@@ -1,113 +1,74 @@
-"use client";
+'use client';
 
-// Disable static generation for this page (requires Convex client)
-export const dynamic = "force-dynamic";
-
-import { useQuery } from "convex/react";
-import { api } from "@/convex/_generated/api";
-import { CalendarWeekView, CalendarEvent } from "@/components/CalendarWeekView";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Calendar } from "lucide-react";
-import { useMemo } from "react";
+import { useQuery } from 'convex/react';
+import { api } from '@/convex/_generated/api';
+import Link from 'next/link';
+import { ArrowLeft, Calendar, Clock, MapPin } from 'lucide-react';
+import { useMemo } from 'react';
 
 export default function CalendarPage() {
-  // Fetch events for the next 60 days to cover week navigation
-  const now = Date.now();
-  const sixtyDaysAgo = now - 60 * 24 * 60 * 60 * 1000;
-  const sixtyDaysAhead = now + 60 * 24 * 60 * 60 * 1000;
+  // Memoize dates to prevent infinite re-renders
+  const dateRange = useMemo(() => {
+    const now = Date.now();
+    return {
+      startDate: now - 7 * 24 * 60 * 60 * 1000,
+      endDate: now + 30 * 24 * 60 * 60 * 1000,
+    };
+  }, []);
 
   const events = useQuery(api.calendar.listEvents, {
-    startDate: sixtyDaysAgo,
-    endDate: sixtyDaysAhead,
-    limit: 500,
+    startDate: dateRange.startDate,
+    endDate: dateRange.endDate,
+    limit: 50,
   });
 
-  // Transform Convex events to CalendarEvent format
-  const formattedEvents: CalendarEvent[] = useMemo(() => {
-    if (!events) return [];
-
-    return events.map((event: {
-      _id: string;
-      title: string;
-      start: number;
-      end: number;
-      isAllDay: boolean;
-      description?: string;
-      location?: string;
-      status: "confirmed" | "tentative" | "cancelled";
-    }) => ({
-      id: event._id,
-      title: event.title,
-      start: new Date(event.start),
-      end: new Date(event.end),
-      isAllDay: event.isAllDay,
-      description: event.description,
-      location: event.location,
-      status: event.status,
-    }));
-  }, [events]);
-
-  const handleEventClick = (event: CalendarEvent) => {
-    console.log("Event clicked:", event);
-    // TODO: Open event detail modal or navigate to event detail page
-  };
-
-  // Loading state
-  if (events === undefined) {
-    return (
-      <div className="p-4 h-screen">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold">Calendar</h1>
-        </div>
-        <div className="h-[calc(100vh-120px)] bg-white rounded-lg border border-slate-200 p-4">
-          <div className="flex gap-2 mb-4">
-            <Skeleton className="h-8 w-24" />
-            <Skeleton className="h-8 w-24" />
-            <Skeleton className="h-8 w-16" />
-          </div>
-          <div className="grid grid-cols-7 gap-2 mb-4">
-            {[1, 2, 3, 4, 5, 6, 7].map((i) => (
-              <Skeleton key={i} className="h-12 w-full" />
-            ))}
-          </div>
-          <div className="space-y-2">
-            {[1, 2, 3, 4, 5].map((i) => (
-              <Skeleton key={i} className="h-16 w-full" />
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Empty state
-  if (events.length === 0) {
-    return (
-      <div className="p-4 h-screen">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold">Calendar</h1>
-        </div>
-        <div className="flex flex-col items-center justify-center p-8 text-center h-[calc(100vh-120px)] bg-white rounded-lg border border-slate-200">
-          <Calendar className="h-12 w-12 text-slate-400 mb-4" />
-          <h3 className="text-lg font-semibold text-slate-700">No events yet</h3>
-          <p className="text-slate-500 mt-1">
-            Sync your Google Calendar to see your events here.
-          </p>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="p-4 h-screen flex flex-col">
-      <div className="flex items-center justify-between mb-4">
-        <h1 className="text-2xl font-bold">Calendar</h1>
-        <div className="text-sm text-slate-500">
-          {events.length} event{events.length !== 1 ? "s" : ""}
+    <div className="min-h-screen bg-slate-900 p-6">
+      <div className="max-w-4xl mx-auto">
+        <Link href="/" className="inline-flex items-center gap-2 text-slate-400 hover:text-white mb-6 transition-colors">
+          <ArrowLeft className="w-4 h-4" />
+          Back to Dashboard
+        </Link>
+
+        <h1 className="text-2xl font-bold text-white mb-6">Calendar</h1>
+
+        <div className="bg-slate-800 rounded-xl border border-slate-700 p-6">
+          {events === undefined ? (
+            <div className="text-slate-400 text-center py-8">Loading events...</div>
+          ) : events.length === 0 ? (
+            <div className="text-center py-12">
+              <Calendar className="w-12 h-12 text-slate-500 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-white mb-2">No events yet</h3>
+              <p className="text-slate-400">Sync your Google Calendar to see your events here.</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {events.map((event) => (
+                <div
+                  key={event._id}
+                  className="p-4 bg-slate-700/50 rounded-lg border border-slate-600 hover:border-slate-500 transition-colors"
+                >
+                  <h3 className="font-semibold text-white mb-2">{event.title}</h3>
+                  <div className="flex items-center gap-4 text-sm text-slate-400">
+                    <div className="flex items-center gap-1">
+                      <Clock className="w-4 h-4" />
+                      {new Date(event.start).toLocaleDateString()} {new Date(event.start).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </div>
+                    {event.location && (
+                      <div className="flex items-center gap-1">
+                        <MapPin className="w-4 h-4" />
+                        {event.location}
+                      </div>
+                    )}
+                  </div>
+                  {event.description && (
+                    <p className="mt-2 text-sm text-slate-400 line-clamp-2">{event.description}</p>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
-      </div>
-      <div className="flex-1 min-h-0">
-        <CalendarWeekView events={formattedEvents} onEventClick={handleEventClick} />
       </div>
     </div>
   );

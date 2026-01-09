@@ -8,8 +8,14 @@
  * @module
  */
 
+import type * as ai_generateDraft from "../ai/generateDraft.js";
+import type * as ai_parseCommand from "../ai/parseCommand.js";
 import type * as calendar from "../calendar.js";
 import type * as calendarActions from "../calendarActions.js";
+import type * as contacts from "../contacts.js";
+import type * as draftRegeneration from "../draftRegeneration.js";
+import type * as draftRegenerationAction from "../draftRegenerationAction.js";
+import type * as drafts from "../drafts.js";
 import type * as emails from "../emails.js";
 import type * as labels from "../labels.js";
 import type * as sync from "../sync.js";
@@ -22,8 +28,14 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  "ai/generateDraft": typeof ai_generateDraft;
+  "ai/parseCommand": typeof ai_parseCommand;
   calendar: typeof calendar;
   calendarActions: typeof calendarActions;
+  contacts: typeof contacts;
+  draftRegeneration: typeof draftRegeneration;
+  draftRegenerationAction: typeof draftRegenerationAction;
+  drafts: typeof drafts;
   emails: typeof emails;
   labels: typeof labels;
   sync: typeof sync;

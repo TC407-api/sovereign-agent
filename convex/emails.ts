@@ -73,6 +73,18 @@ export const getEmail = query({
   },
 });
 
+export const getEmailsByContact = query({
+  args: { email: v.string(), limit: v.optional(v.number()) },
+  handler: async (ctx, args) => {
+    const limit = args.limit ?? 50;
+    return await ctx.db
+      .query("emails")
+      .filter((q) => q.eq(q.field("from"), args.email))
+      .order("desc")
+      .take(limit);
+  },
+});
+
 export const updateEmail = mutation({
   args: {
     id: v.id("emails"),
